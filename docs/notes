@@ -1,0 +1,5 @@
+don't make admin seperate table
+    - seperate customer and user
+    - seperate location
+    - is reservation active 
+    - is car active
