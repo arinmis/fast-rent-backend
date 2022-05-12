@@ -7,13 +7,13 @@ car rental software backend
 -   Create
 
 ```
-python3 -m venv  venv
+python3 -m venv  env
 ```
 
 -   Activate virtual enviroment
 
 ```
-source venv/bin/activate
+source env/bin/activate
 ```
 
 -   install dependencies
