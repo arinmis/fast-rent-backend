@@ -40,12 +40,12 @@ def getHello(request):
 
 
 @api_view(['GET', 'POST'])
-def user(request):
-    # print("from singup", request.data["name"]);
-    # return given user informations
+@permission_classes([IsAuthenticated])
+def user(request, id):
     if request.method == 'GET':
-        username = request.query_params.get('username')
-        users  = models.User.objects.filter(username=username) 
-        serializer = serializers.UserSerializer(users, many=True)
+        user  = models.User.objects.filter(id=id) 
+        serializer = serializers.UserSerializer(user, many=True)
         return Response(serializer.data)
+    elif requested.method == "PUT":
+        pass
     return Response("signup")

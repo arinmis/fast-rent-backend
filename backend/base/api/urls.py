@@ -10,6 +10,6 @@ urlpatterns = [
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('hello/', views.getHello),
-    path('user/', views.user), 
+    path('manager/<int:id>/', views.user), 
 
 ]
