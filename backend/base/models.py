@@ -14,7 +14,7 @@ NOTE: user types
 """
 
 class Customer(models.Model):
- user = models.OneToOneField(User, on_delete=models.CASCADE)
+ user_id = models.OneToOneField(User, on_delete=models.CASCADE)
  citizen_id = models.CharField(max_length=15)
 
 
@@ -31,9 +31,9 @@ class FuelType(models.Model):
 
 
 class Car(models.Model):
-     transmission = models.ForeignKey(TranmissionType, on_delete=models.CASCADE)
-     brand = models.ForeignKey(BrandType, on_delete=models.CASCADE)
-     fuel  = models.ForeignKey(FuelType, on_delete=models.CASCADE)
+     transmission_id = models.ForeignKey(TranmissionType, on_delete=models.CASCADE)
+     brand_id = models.ForeignKey(BrandType, on_delete=models.CASCADE)
+     fuel_id  = models.ForeignKey(FuelType, on_delete=models.CASCADE)
      photo = models.ImageField(upload_to='cars')
      daily_price = models.IntegerField()
      is_active = models.BooleanField(default=False);
@@ -55,4 +55,4 @@ class Reservation(models.Model):
 
 
 class Rent(models.Model):
-    reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE)
+    reservation_id = models.OneToOneField(Reservation, on_delete=models.CASCADE)
