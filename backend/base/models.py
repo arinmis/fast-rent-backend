@@ -12,6 +12,7 @@ NOTE: user types
     Staff user (can access the admin interface): is_staff=True
     Super user (can do everything): is_superuser=True
 """
+
 class Customer(models.Model):
  user = models.OneToOneField(User, on_delete=models.CASCADE)
  citizen_id = models.CharField(max_length=15)
