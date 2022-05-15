@@ -170,3 +170,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # custom user model
 AUTH_USER_MODEL = 'base.User'
+
+
