@@ -14,7 +14,7 @@ NOTE: user types
 """
 
 class Customer(models.Model):
- user_id = models.OneToOneField(User, on_delete=models.CASCADE)
+ user = models.OneToOneField(User, on_delete=models.CASCADE)
  citizen_id = models.CharField(max_length=15)
 
 

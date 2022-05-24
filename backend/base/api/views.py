@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
+from django.forms.models import model_to_dict
 from . import serializers
 import base.models as models
 
@@ -40,12 +41,14 @@ def getHello(request):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def user(request, id):
+# @permission_classes([IsAuthenticated])
+def customer(request, id):
     if request.method == 'GET':
-        user  = models.User.objects.filter(id=id) 
-        serializer = serializers.UserSerializer(user, many=True)
-        return Response(serializer.data)
+        print("user is: ", type(user_serializer.data))
+        # get customer info
+        customer  = models.Customer.objects.filter(user_id=id) 
+        customer_serializer = serializers.CustomerSerializer(customer, many=True)
+        return Response(customer_serializer.data)
     elif requested.method == "PUT":
         pass
     return Response("signup")
