@@ -36,7 +36,7 @@ def getRoutes(request):
 
 
 
-@api_view(['GET', 'POST', "PUT"])
+@api_view(['GET', "PUT"])
 # @permission_classes([IsAuthenticated])
 def customer(request, id):
     customer  = models.Customer.objects.filter(user_id=id) 
@@ -45,18 +45,12 @@ def customer(request, id):
         serializer = serializers.CustomerSerializer(customer, many=True)
         return Response(serializer.data)
 
-    elif request.method == "POST":
-        serializer = serializers.CustomerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     elif request.method == "PUT":
         serializer = serializers.CustomerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.update(customer, serializer.data)
+        # skip validation for now: https://stackoverflow.com/questions/60533893/user-with-this-username-already-exists-in-drf-modelserializer-if-not-specified
+        if serializer.is_valid() or True:
+            serializer.update(customer[0], serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print("data is not valid")
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -67,6 +61,5 @@ def create_customer(request):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

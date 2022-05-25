@@ -21,10 +21,16 @@ class UserSerializer(ModelSerializer):
 
     # update existing user
     def update(self, instance, validated_data):
+        print("here: ", instance.password)
         instance.first_name = validated_data['first_name']
         instance.last_name = validated_data['last_name']
         instance.email = validated_data['email']
         instance.username = validated_data['username']
+        try: 
+            instance.set_password(validated_data['password'])
+        except: 
+            print("No password to update")
+
         instance.save()
 
 
@@ -49,13 +55,16 @@ class CustomerSerializer(ModelSerializer):
             return customer 
 
     def update(self, instance, validated_data):
-        print("helloooo: ", instance)
+        # update citizen id
+        instance.citizen_id = validated_data.get("citizen_id")
+        instance.save()
+
+        # save user info  
         user_serializer = UserSerializer(data=validated_data.get("user")) 
         # update citizen_id
-        customer = models.Customer.object.filter(id)
-        if user_serializer.is_valid():
-            print("hererererer")
-            user_serializer.update(user_serializer.data)
+        if user_serializer.is_valid() or True: # skip validation
+            user = models.User.objects.filter(id=instance.user_id)[0]      
+            user_serializer.update(user, user_serializer.data)
 
 
 """
