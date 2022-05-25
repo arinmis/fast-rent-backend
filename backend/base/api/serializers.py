@@ -15,15 +15,18 @@ class UserSerializer(ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name']
         )
-
         user.set_password(validated_data['password'])
         user.save()
-
         return user
 
     # update existing user
-    def update(self, validated_data):
-        user = models.User.objects.get(filter=validated_data["username"])
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data['first_name']
+        instance.last_name = validated_data['last_name']
+        instance.email = validated_data['email']
+        instance.username = validated_data['username']
+        instance.save()
+
 
 class CustomerSerializer(ModelSerializer):
     user = UserSerializer() 
@@ -45,7 +48,14 @@ class CustomerSerializer(ModelSerializer):
             print("here is user", user.username, user.first_name, user.last_name)
             return customer 
 
-            
+    def update(self, instance, validated_data):
+        print("helloooo: ", instance)
+        user_serializer = UserSerializer(data=validated_data.get("user")) 
+        # update citizen_id
+        customer = models.Customer.object.filter(id)
+        if user_serializer.is_valid():
+            print("hererererer")
+            user_serializer.update(user_serializer.data)
 
 
 """

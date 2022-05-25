@@ -34,23 +34,39 @@ def getRoutes(request):
     return Response(routes)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def getHello(request):
-    return Response("restricted hello")
 
 
 @api_view(['GET', 'POST', "PUT"])
 # @permission_classes([IsAuthenticated])
 def customer(request, id):
     customer  = models.Customer.objects.filter(user_id=id) 
+
     if request.method == 'GET':
         serializer = serializers.CustomerSerializer(customer, many=True)
         return Response(serializer.data)
+
     elif request.method == "POST":
         serializer = serializers.CustomerSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response("signup")
+
+    elif request.method == "PUT":
+        serializer = serializers.CustomerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.update(customer, serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("data is not valid")
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def create_customer(request):
+    serializer = serializers.CustomerSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
