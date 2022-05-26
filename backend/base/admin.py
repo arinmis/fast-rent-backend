@@ -9,7 +9,7 @@ from .models import *
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Customer)
-admin.site.register(TranmissionType)
+admin.site.register(TransmissionType)
 admin.site.register(BrandType)
 admin.site.register(FuelType)
 admin.site.register(Car)
