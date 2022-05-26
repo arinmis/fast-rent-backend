@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from django.forms.models import model_to_dict
 from . import serializers
+import datetime
 import base.models as models
 
 # customize acces tokens
@@ -79,4 +80,32 @@ def car(request):
     print("cars: ", cars[0].daily_price)
     serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
     return Response(serializer.data)
+
+
+"""
+example request
+{
+    "user": 7,  
+    "car": 1, 
+    "pickup_location": 1, 
+    "return_location": 1, 
+    "pickup_date": 1653598910.668,
+    "return_date": 1653598910.668
+}
+"""
+@api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+def reservation(request):
+    serializer_data = request.data 
+    request.data["user"] = models.User.objects.filter(id=request.data["user"])[0]
+    request.data["car"] = models.Car.objects.filter(id=request.data["car"])[0]
+    request.data["pickup_location"] = models.Location.objects.filter(id=request.data["pickup_location"])[0]
+    request.data["return_location"] = models.Location.objects.filter(id=request.data["return_location"])[0]
+    request.data["pickup_date"] = datetime.datetime.fromtimestamp(request.data["pickup_date"]).strftime('%Y-%m-%d')
+    request.data["return_date"] = datetime.datetime.fromtimestamp(request.data["return_date"]).strftime('%Y-%m-%d')
+    # save reservation 
+    serializer = serializers.ReservationSerializer(data=request.data)
+    serializer.is_valid() # fix this: why data invalid 
+    serializer.create(serializer.data)
+    return Response("Reservation created")
 
