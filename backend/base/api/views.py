@@ -72,7 +72,7 @@ def rent_locations(request):
 
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def car(request):
     print("here")
     cars = models.Car.objects.all()

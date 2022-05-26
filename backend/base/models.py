@@ -19,7 +19,7 @@ class Customer(models.Model):
 
 
 # types are constant values stored in DB
-class TranmissionType(models.Model):
+class TransmissionType(models.Model):
     transmission_type = models.CharField(max_length=20)
 
 class BrandType(models.Model):
@@ -31,9 +31,9 @@ class FuelType(models.Model):
 
 
 class Car(models.Model):
-     transmission_id = models.ForeignKey(TranmissionType, on_delete=models.CASCADE)
-     brand_id = models.ForeignKey(BrandType, on_delete=models.CASCADE)
-     fuel_id  = models.ForeignKey(FuelType, on_delete=models.CASCADE)
+     transmission_type = models.ForeignKey(TransmissionType, on_delete=models.CASCADE)
+     brand_type = models.ForeignKey(BrandType, on_delete=models.CASCADE)
+     fuel_type  = models.ForeignKey(FuelType, on_delete=models.CASCADE)
      photo = models.ImageField(upload_to='cars')
      daily_price = models.IntegerField()
      is_active = models.BooleanField(default=False);
