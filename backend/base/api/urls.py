@@ -13,4 +13,5 @@ urlpatterns = [
     path('create-customer/', views.create_customer), 
     path('rent-locations/', views.rent_locations), 
     path('car/', views.car), 
+    path('reservation/', views.reservation), 
 ]

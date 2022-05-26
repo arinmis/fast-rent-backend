@@ -103,3 +103,22 @@ class CarSerializer(ModelSerializer):
         photo_url = car.photo.url
         return request.build_absolute_uri(photo_url)
 
+
+class ReservationSerializer(ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = models.Reservation
+        fields = "__all__" 
+
+    def create(self, validated_data):
+        reservation = models.Reservation.objects.create(
+            pickup_date = validated_data["pickup_date"],
+            return_date = validated_data["return_date"],
+            user = validated_data["user"],
+            car = validated_data["car"],
+            pickup_location = validated_data["pickup_location"],
+            return_location = validated_data["return_location"],
+        )
+
+
+

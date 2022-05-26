@@ -47,8 +47,8 @@ class Location(models.Model):
 class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    pickup_location_id = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='pickup_location')
-    return_location_id = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='return_location')
+    pickup_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='pickup_location')
+    return_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='return_location')
     pickup_date = models.DateField()   
     return_date = models.DateField()   
     is_active = models.BooleanField(default=False);
