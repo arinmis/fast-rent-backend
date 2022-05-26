@@ -11,5 +11,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('customer/<int:id>/', views.customer), 
     path('create-customer/', views.create_customer), 
-
+    path('rent-locations/', views.rent_locations), 
+    path('car/', views.car), 
 ]

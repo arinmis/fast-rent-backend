@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SlugRelatedField, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SlugRelatedField
 import base.models as models 
 
 
@@ -73,7 +73,7 @@ class LocationSerializer(ModelSerializer):
 
 
 class CarSerializer(ModelSerializer):
-    photo_url = SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
 
     class Meta: 
         model = models.Car

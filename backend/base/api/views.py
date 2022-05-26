@@ -37,7 +37,7 @@ def getRoutes(request):
 
 
 @api_view(['GET', "PUT"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def customer(request, id):
     customer  = models.Customer.objects.filter(user_id=id) 
 
@@ -62,4 +62,21 @@ def create_customer(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def rent_locations(request):
+    location = models.Location.objects.all()
+    serializer = serializers.LocationSerializer(location, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+def car(request):
+    print("here")
+    cars = models.Car.objects.all()
+    print("cars: ", cars[0].daily_price)
+    serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
+    return Response(serializer.data)
 
