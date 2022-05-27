@@ -93,19 +93,24 @@ example request
     "return_date": 1653598910.668
 }
 """
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 # @permission_classes([IsAuthenticated])
 def reservation(request):
-    serializer_data = request.data 
-    request.data["user"] = models.User.objects.filter(id=request.data["user"])[0]
-    request.data["car"] = models.Car.objects.filter(id=request.data["car"])[0]
-    request.data["pickup_location"] = models.Location.objects.filter(id=request.data["pickup_location"])[0]
-    request.data["return_location"] = models.Location.objects.filter(id=request.data["return_location"])[0]
-    request.data["pickup_date"] = datetime.datetime.fromtimestamp(request.data["pickup_date"]).strftime('%Y-%m-%d')
-    request.data["return_date"] = datetime.datetime.fromtimestamp(request.data["return_date"]).strftime('%Y-%m-%d')
-    # save reservation 
-    serializer = serializers.ReservationSerializer(data=request.data)
-    serializer.is_valid() # fix this: why data invalid 
-    serializer.create(serializer.data)
-    return Response("Reservation created")
+    if request.method == "GET":
+        reservations = models.Reservation.objects.filter(user_id=request.user.id)
+        serializer = serializers.ReservationSerializer(reservations, many=True)
+        return Response(serializer.data)
+    elif request.method == "POST":
+        serializer_data = request.data 
+        request.data["user"] = models.User.objects.filter(id=request.data["user"])[0]
+        request.data["car"] = models.Car.objects.filter(id=request.data["car"])[0]
+        request.data["pickup_location"] = models.Location.objects.filter(id=request.data["pickup_location"])[0]
+        request.data["return_location"] = models.Location.objects.filter(id=request.data["return_location"])[0]
+        request.data["pickup_date"] = datetime.datetime.fromtimestamp(request.data["pickup_date"]).strftime('%Y-%m-%d')
+        request.data["return_date"] = datetime.datetime.fromtimestamp(request.data["return_date"]).strftime('%Y-%m-%d')
+        # save reservation 
+        serializer = serializers.ReservationSerializer(data=request.data)
+        serializer.is_valid() # fix this: why data invalid 
+        serializer.create(serializer.data)
+        return Response("Reservation created")
 
