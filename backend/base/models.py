@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 # Create your models here.
 
@@ -31,9 +32,9 @@ class FuelType(models.Model):
 
 
 class Car(models.Model):
-     transmission_type = models.ForeignKey(TransmissionType, on_delete=models.CASCADE)
-     brand_type = models.ForeignKey(BrandType, on_delete=models.CASCADE)
-     fuel_type  = models.ForeignKey(FuelType, on_delete=models.CASCADE)
+     transmission_type = models.ForeignKey(TransmissionType, on_delete=models.PROTECT)
+     brand_type = models.ForeignKey(BrandType, on_delete=models.PROTECT)
+     fuel_type  = models.ForeignKey(FuelType, on_delete=models.PROTECT)
      photo = models.ImageField(upload_to='cars')
      daily_price = models.IntegerField()
      is_active = models.BooleanField(default=False);
@@ -45,13 +46,13 @@ class Location(models.Model):
 
 
 class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    pickup_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='pickup_location')
-    return_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='return_location')
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    car = models.ForeignKey(Car, on_delete=models.PROTECT)
+    pickup_location = models.ForeignKey(Location, on_delete=models.PROTECT, related_name='pickup_location')
+    return_location = models.ForeignKey(Location, on_delete=models.PROTECT, related_name='return_location')
     pickup_date = models.DateField()   
     return_date = models.DateField()   
     is_active = models.BooleanField(default=True);
 
 class Rent(models.Model):
-    reservation_id = models.OneToOneField(Reservation, on_delete=models.CASCADE)
+    reservation_id = models.OneToOneField(Reservation, on_delete=models.PROTECT)
