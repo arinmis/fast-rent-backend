@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 # Create your models here.
 
@@ -52,7 +53,6 @@ class Reservation(models.Model):
     pickup_date = models.DateField()   
     return_date = models.DateField()   
     is_active = models.BooleanField(default=True);
-
 
 class Rent(models.Model):
     reservation_id = models.OneToOneField(Reservation, on_delete=models.CASCADE)

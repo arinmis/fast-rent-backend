@@ -75,9 +75,7 @@ def rent_locations(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def car(request):
-    print("here")
     cars = models.Car.objects.all()
-    print("cars: ", cars[0].daily_price)
     serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
     return Response(serializer.data)
 
@@ -97,8 +95,9 @@ example request
 # @permission_classes([IsAuthenticated])
 def reservation(request):
     if request.method == "GET":
-        reservations = models.Reservation.objects.filter(user_id=request.user.id)
-        serializer = serializers.ReservationSerializer(reservations, many=True)
+        # reservations = models.Reservation.objects.filter(user_id=request.user.id)
+        reservations = models.Reservation.objects.filter(user_id=7)
+        serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
     elif request.method == "POST":
         serializer_data = request.data 
