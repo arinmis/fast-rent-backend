@@ -93,10 +93,10 @@ example request
 """
 @api_view(['POST', 'GET'])
 # @permission_classes([IsAuthenticated])
-def reservation(request):
+def reservation(request, id = None):
     if request.method == "GET":
-        # reservations = models.Reservation.objects.filter(user_id=request.user.id)
-        reservations = models.Reservation.objects.filter(user_id=7)
+        reservations = models.Reservation.objects.filter(user_id=request.user.id)
+        reservations = models.Reservation.objects.filter(user_id=request.user.id)
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
     elif request.method == "POST":
@@ -112,4 +112,7 @@ def reservation(request):
         serializer.is_valid() # fix this: why data invalid 
         serializer.create(serializer.data)
         return Response("Reservation created")
+    elif request.method == "DELETE":
+        reservations = models.Reservation.objects.filter(user_id=request.user.id)
+        print("HERE", id)
 

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 from .views import MyTokenObtainPairView
 from rest_framework_simplejwt.views import (
@@ -13,5 +13,6 @@ urlpatterns = [
     path('create-customer/', views.create_customer), 
     path('rent-locations/', views.rent_locations), 
     path('car/', views.car), 
-    path('reservation/', views.reservation), 
+    re_path(r'^reservation/((?P<id>\d+)/)?$', views.reservation), 
+    # path('reservation/', views.reservation), 
 ]
