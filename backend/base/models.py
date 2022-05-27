@@ -51,7 +51,7 @@ class Reservation(models.Model):
     return_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='return_location')
     pickup_date = models.DateField()   
     return_date = models.DateField()   
-    is_active = models.BooleanField(default=False);
+    is_active = models.BooleanField(default=True);
 
 
 class Rent(models.Model):

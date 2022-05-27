@@ -105,7 +105,6 @@ class CarSerializer(ModelSerializer):
 
 
 class ReservationSerializer(ModelSerializer):
-    user = UserSerializer()
     class Meta:
         model = models.Reservation
         fields = "__all__" 
