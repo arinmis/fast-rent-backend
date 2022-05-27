@@ -1,5 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SlugRelatedField, SerializerMethodField
 import base.models as models
+from django.contrib.sites.models import Site
+from django.conf import settings
 
 
 class UserSerializer(ModelSerializer):
@@ -72,7 +74,6 @@ class LocationSerializer(ModelSerializer):
         fields = "__all__"
 
 
-
 class TransmissionTypeSerializer(ModelSerializer):
     class Meta:
         model = models.TransmissionType
@@ -89,7 +90,6 @@ class BrandTypeSerializer(ModelSerializer):
         fields = ["brand_type"]
 
 class CarSerializer(ModelSerializer):
-    photo_url = SerializerMethodField()
     transmission_type = TransmissionTypeSerializer(many=False)
     brand_type = BrandTypeSerializer(many=False)
     fuel_type = FuelTypeSerializer(many=False)
@@ -98,13 +98,13 @@ class CarSerializer(ModelSerializer):
         model = models.Car
         fields = "__all__"
 
-    def get_photo_url(self, car):
-        request = self.context.get('request')
-        photo_url = car.photo.url
-        return request.build_absolute_uri(photo_url)
-
 
 class ReservationSerializer(ModelSerializer):
+    user = UserSerializer()
+    pickup_location = LocationSerializer()
+    return_location = LocationSerializer()
+    car =  CarSerializer() 
+
     class Meta:
         model = models.Reservation
         fields = "__all__" 
@@ -118,6 +118,5 @@ class ReservationSerializer(ModelSerializer):
             pickup_location = validated_data["pickup_location"],
             return_location = validated_data["return_location"],
         )
-
 
 
