@@ -94,6 +94,7 @@ example request
 @api_view(['POST', 'GET', 'DELETE'])
 # @permission_classes([IsAuthenticated])
 def reservation(request, id = None):
+    print("id is", id)
     if request.method == "GET":
         # reservations = models.Reservation.objects.filter(user_id=request.user.id)
         reservations = models.Reservation.objects.filter(user_id=7)
@@ -113,8 +114,10 @@ def reservation(request, id = None):
         serializer.create(serializer.data)
         return Response("Reservation created")
     elif request.method == "DELETE":
+        # deactivate reservation
         if id:
-            print("HERE", id)
-            reservations = models.Reservation.objects.filter(user_id=request.user.id)
-        return Response( "give id to delete reservation", status=status.HTTP_400_BAD_REQUEST)
-
+            reservation = models.Reservation.objects.filter(id=id)[0]
+            reservation.is_active = False 
+            reservation.save()
+            return Response("reservation " + id + " is deactivated")
+        return Response( id, status=status.HTTP_400_BAD_REQUEST)
