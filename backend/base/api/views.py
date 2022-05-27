@@ -72,12 +72,15 @@ def rent_locations(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['GET', "POST"])
 @permission_classes([IsAuthenticated])
 def car(request):
-    cars = models.Car.objects.all()
-    serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
-    return Response(serializer.data)
+    if request.method == "GET":
+        cars = models.Car.objects.all()
+        serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
+        return Response(serializer.data)
+    elif request.method == "POST":
+        return Response(request.data)
 
 
 """
