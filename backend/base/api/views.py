@@ -6,7 +6,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from django.forms.models import model_to_dict
-from .utils import epochToDate, deallocate_car
+from . import utils 
 from itertools import chain
 from django.db.models import Q
 from threading import Timer
@@ -86,8 +86,8 @@ def car(request):
     elif request.method == "POST":
         # cars that are rented given range
         cars_busy = models.Reservation.objects.filter(
-                   (Q(pickup_date__gte=epochToDate(request.data["pickup_date"])) & 
-                   Q(return_date__lte=epochToDate(request.data["return_date"]))) &
+                   (Q(pickup_date__gte=utils.epochToDate(request.data["pickup_date"])) & 
+                   Q(return_date__lte=utils.epochToDate(request.data["return_date"]))) &
                    Q(is_active=True)
                    ).values_list("car") 
         # all cars in given location
@@ -132,8 +132,8 @@ def reservation(request, id = None):
         request.data["car"] = models.Car.objects.filter(id=request.data["car"])[0]
         request.data["pickup_location"] = models.Location.objects.filter(id=request.data["pickup_location"])[0]
         request.data["return_location"] = models.Location.objects.filter(id=request.data["return_location"])[0]
-        request.data["pickup_date"] = epochToDate(request.data["pickup_date"])
-        request.data["return_date"] = epochToDate(request.data["return_date"])
+        request.data["pickup_date"] = utils.epochToDate(request.data["pickup_date"])
+        request.data["return_date"] = utils.epochToDate(request.data["return_date"])
 
         # save reservation 
         serializer = serializers.ReservationSerializer(data=request.data)
@@ -155,9 +155,13 @@ def allocate_car(request, id):
     car = models.Car.objects.get(pk=id)
     car.is_allocated = True
     car.save()
-    allocate_second = 300
-    t = Timer(allocate_second, deallocate_car, [id])
+    allocate_second = 10 
+    t = Timer(allocate_second, utils.deallocate_car, [id])
+    print("car {} will be deallocated in {} sn".format(id, allocate_second))
     t.start()
-    return Response("car {} will be deallocated in {} second".format(id, allocate_second))
+    return Response({"deallocate_time": str(allocate_second)})
 
+@api_view(['GET'])
+def deallocate_car(request, id):
+    deallocate_car(id)
 
