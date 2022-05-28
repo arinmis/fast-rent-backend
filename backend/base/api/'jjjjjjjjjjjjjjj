@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from django.forms.models import model_to_dict
 from .utils import epochToDate 
 from itertools import chain
-from django.db.models import Q
 from . import serializers
 import datetime
 import base.models as models
@@ -93,12 +92,15 @@ def car(request):
                     location=request.data["pickup_location"]
                     ).values_list("id") 
         car_different_city = list(chain(cars_busy, cars_not_in_location))
-        # merge all unaviable cars
-        unavailable_cars = ()
+        print(car_different_city)
+        not_available_cars = ()
         for t in car_different_city:
-            unavailable_cars += t  
-        cars = models.Car.objects.exclude(Q(id__in=unavailable_cars) | Q(is_active=True))
+            not_available += t  
+        not_available_cars = list(set(not_available_cars))
+        print(not_available_cars)
+        cars = models.Car.objects.exclude(id__in=not_available_cars)
         serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
+        print(cars)
         return Response(serializer.data)
 
 
