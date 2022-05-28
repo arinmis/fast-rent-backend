@@ -9,6 +9,7 @@ from django.forms.models import model_to_dict
 from .utils import epochToDate, deallocate_car
 from itertools import chain
 from django.db.models import Q
+from threading import Timer
 from . import serializers
 import datetime
 import base.models as models
@@ -149,12 +150,14 @@ def reservation(request, id = None):
         return Response( id, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view([ 'GET'])
+@api_view(['GET'])
 def allocate_car(request, id):
     car = models.Car.objects.get(pk=id)
     car.is_allocated = True
     car.save()
-    deallocate_car(id)
-    return Response(serializers.CarSerializer(car).data)
+    allocate_second = 300
+    t = Timer(allocate_second, deallocate_car, [id])
+    t.start()
+    return Response("car {} will be deallocated in {} second".format(id, allocate_second))
 
 
