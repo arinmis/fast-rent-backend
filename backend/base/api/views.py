@@ -85,8 +85,9 @@ def car(request):
     elif request.method == "POST":
         # cars that are rented given range
         cars_busy = models.Reservation.objects.filter(
-                   pickup_date__gte=epochToDate(request.data["pickup_date"]), 
-                   return_date__lte=epochToDate(request.data["return_date"]), 
+                   (Q(pickup_date__gte=epochToDate(request.data["pickup_date"])) & 
+                   Q(return_date__lte=epochToDate(request.data["return_date"]))) &
+                   Q(is_active=True)
                    ).values_list("car") 
         # all cars in given location
         cars_not_in_location= models.Car.objects.exclude(
@@ -97,10 +98,11 @@ def car(request):
         unavailable_cars = ()
         for t in car_different_city:
             unavailable_cars += t  
-        cars = models.Car.objects.exclude(Q(id__in=unavailable_cars) | Q(is_active=True))
+        # serialize aviable cars
+        print(unavailable_cars)
+        cars = models.Car.objects.exclude(Q(id__in=unavailable_cars) | Q(is_allocated=True))  
         serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
         return Response(serializer.data)
-
 
 """
 example request
