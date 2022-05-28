@@ -123,7 +123,7 @@ def reservation(request, id = None):
     if request.method == "GET":
         # reservations = models.Reservation.objects.filter(user_id=request.user.id)
         # TODO: delete line below
-        reservations = models.Reservation.objects.filter(user_id=7, pickup_date__gt=datetime.datetime.now())
+        reservations = models.Reservation.objects.filter(user_id=7, pickup_date__gt=datetime.datetime.now(), is_active=True)
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
     elif request.method == "POST":
@@ -150,11 +150,15 @@ def reservation(request, id = None):
         return Response( id, status=status.HTTP_400_BAD_REQUEST)
 
 
+"""
+reservations which's pick-up 
+date passed are called rent 
+"""
 @api_view(['GET'])
 def rent(request):
         # reservations = models.Reservation.objects.filter(user_id=request.user.id)
         # TODO: delete line below
-        reservations = models.Reservation.objects.filter(user_id=7, pickup_date__lte=datetime.datetime.now())
+        reservations = models.Reservation.objects.filter(Q(user_id=7) & (Q(pickup_date__lte=datetime.datetime.now()) | Q(is_active=False)))
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
 
