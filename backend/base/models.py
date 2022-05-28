@@ -40,8 +40,7 @@ class Car(models.Model):
      location = models.ForeignKey(Location, on_delete=models.PROTECT)
      photo = models.ImageField(upload_to='cars')
      daily_price = models.IntegerField()
-     is_active = models.BooleanField(default=False);
-
+     is_allocated = models.BooleanField(default=False);
 
 class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
