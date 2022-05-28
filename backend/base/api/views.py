@@ -6,6 +6,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from django.forms.models import model_to_dict
+from .utils import epochToDate 
 from . import serializers
 import datetime
 import base.models as models
@@ -109,8 +110,9 @@ def reservation(request, id = None):
         request.data["car"] = models.Car.objects.filter(id=request.data["car"])[0]
         request.data["pickup_location"] = models.Location.objects.filter(id=request.data["pickup_location"])[0]
         request.data["return_location"] = models.Location.objects.filter(id=request.data["return_location"])[0]
-        request.data["pickup_date"] = datetime.datetime.fromtimestamp(request.data["pickup_date"]).strftime('%Y-%m-%d')
-        request.data["return_date"] = datetime.datetime.fromtimestamp(request.data["return_date"]).strftime('%Y-%m-%d')
+        request.data["pickup_date"] = epochToDate(request.data["pickup_date"])
+        request.data["return_date"] = epochToDate(request.data["return_date"])
+
         # save reservation 
         serializer = serializers.ReservationSerializer(data=request.data)
         serializer.is_valid() # fix this: why data invalid 
