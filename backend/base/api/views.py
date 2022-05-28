@@ -123,7 +123,7 @@ def reservation(request, id = None):
     if request.method == "GET":
         # reservations = models.Reservation.objects.filter(user_id=request.user.id)
         # TODO: delete line below
-        reservations = models.Reservation.objects.filter(user_id=7)
+        reservations = models.Reservation.objects.filter(user_id=7, pickup_date__gt=datetime.datetime.now())
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
     elif request.method == "POST":
@@ -151,11 +151,24 @@ def reservation(request, id = None):
 
 
 @api_view(['GET'])
+def rent(request):
+        # reservations = models.Reservation.objects.filter(user_id=request.user.id)
+        # TODO: delete line below
+        reservations = models.Reservation.objects.filter(user_id=7, pickup_date__lte=datetime.datetime.now())
+        serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
+        return Response(serializer.data)
+
+@api_view(['GET'])
 def allocate_car(request, id):
     car = models.Car.objects.get(pk=id)
+    # if already allocated return error
+    print("is car allocated: ", car.is_allocated)
+    if (car.is_allocated):
+        return Response("car {} has been allocated".format(id), status=status.HTTP_406_NOT_ACCEPTABLE)  
     car.is_allocated = True
     car.save()
-    allocate_second = 10 
+    # time for allocation
+    allocate_second = 60 
     t = Timer(allocate_second, utils.deallocate_car, [id])
     print("car {} will be deallocated in {} sn".format(id, allocate_second))
     t.start()
@@ -163,5 +176,5 @@ def allocate_car(request, id):
 
 @api_view(['GET'])
 def deallocate_car(request, id):
-    deallocate_car(id)
-
+    utils.deallocate_car(id)
+    return Response("car {} is deallocated".format(id))
