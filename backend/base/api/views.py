@@ -6,7 +6,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from django.forms.models import model_to_dict
-from .utils import epochToDate 
+from .utils import epochToDate, deallocate_car
 from itertools import chain
 from django.db.models import Q
 from . import serializers
@@ -147,3 +147,14 @@ def reservation(request, id = None):
             reservation.save()
             return Response("reservation " + id + " is deactivated")
         return Response( id, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view([ 'GET'])
+def allocate_car(request, id):
+    car = models.Car.objects.get(pk=id)
+    car.is_allocated = True
+    car.save()
+    deallocate_car(id)
+    return Response(serializers.CarSerializer(car).data)
+
+
