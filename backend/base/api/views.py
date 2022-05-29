@@ -105,6 +105,25 @@ def car(request):
         serializer = serializers.CarSerializer(cars, many=True, context={"request": request})
         return Response(serializer.data)
 
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def save_car(request):
+    try:
+        car = models.Car.objects.create(
+                brand_type = models.BrandType.objects.get(pk=request.data["brand_type"]),
+                fuel_type = models.FuelType.objects.get(pk=request.data["fuel_type"]),
+                transmission_type =models.TransmissionType.objects.get(pk=request.data["transmission_type"]),
+                location = models.Location.objects.get(pk=request.data["location"]),
+                photo = request.data["photo"],
+                daily_price = request.data["daily_price"],
+                )
+        print(car)
+        car.save()
+        return Response("car is saved with id {}".format(car.id))
+    except:
+        return Response("post a valid car", status=status.HTTP_400_BAD_REQUEST)
+
 """
 example request
 {
