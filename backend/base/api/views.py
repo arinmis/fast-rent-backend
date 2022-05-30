@@ -106,23 +106,35 @@ def car(request):
         return Response(serializer.data)
 
 
-@api_view(["POST"])
+@api_view(["POST", "DELETE"])
 @permission_classes([IsAuthenticated])
-def save_car(request):
-    try:
-        car = models.Car.objects.create(
-                brand_type = models.BrandType.objects.get(pk=request.data["brand_type"]),
-                fuel_type = models.FuelType.objects.get(pk=request.data["fuel_type"]),
-                transmission_type =models.TransmissionType.objects.get(pk=request.data["transmission_type"]),
-                location = models.Location.objects.get(pk=request.data["location"]),
-                photo = request.data["photo"],
-                daily_price = request.data["daily_price"],
-                )
-        print(car)
-        car.save()
-        return Response("car is saved with id {}".format(car.id))
-    except:
-        return Response("post a valid car", status=status.HTTP_400_BAD_REQUEST)
+def car_crud(request, id = None):
+    if request.method == "POST":
+        try:
+            car = models.Car.objects.create(
+                    brand_type = models.BrandType.objects.get(pk=request.data["brand_type"]),
+                    fuel_type = models.FuelType.objects.get(pk=request.data["fuel_type"]),
+                    transmission_type =models.TransmissionType.objects.get(pk=request.data["transmission_type"]),
+                    location = models.Location.objects.get(pk=request.data["location"]),
+                    photo = request.data["photo"],
+                    daily_price = request.data["daily_price"],
+                    )
+            print("daily_price", request.data["daily_price"])
+            car.save()
+            serializer = serializers.CarSerializer(car, context={"request": request})
+            print(car)
+            print(serializer.data)
+            return Response(serializer.data)
+        except:
+            return Response("post a valid car", status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        if id == None:
+            return Response("car id is needed", status=status.HTTP_400_BAD_REQUEST)
+        car = models.Car.objects.get(pk=id)
+        car.delete()
+        return Response("car {} is has been deleted".format(id))
+        
 
 """
 example request
@@ -136,14 +148,13 @@ example request
 }
 """
 @api_view(['POST', 'GET', 'DELETE'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def reservation(request, id = None):
     print("id is", id)
     if request.method == "GET":
-        # reservations = models.Reservation.objects.filter(user_id=request.user.id)
-        # TODO: delete line below
-        reservations = models.Reservation.objects.filter(user_id=7, pickup_date__gt=datetime.datetime.now(), is_active=True)
+        reservations = models.Reservation.objects.filter(user_id=request.user.id, pickup_date__gte=datetime.datetime.now(), is_active=True)
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
+        print(request.user.id, serializer.data)
         return Response(serializer.data)
     elif request.method == "POST":
         serializer_data = request.data 
@@ -174,14 +185,14 @@ reservations which's pick-up
 date passed are called rent 
 """
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def rent(request):
-        # reservations = models.Reservation.objects.filter(user_id=request.user.id)
-        # TODO: delete line below
-        reservations = models.Reservation.objects.filter(Q(user_id=7) & (Q(pickup_date__lte=datetime.datetime.now()) | Q(is_active=False)))
+        reservations = models.Reservation.objects.filter(Q(user_id=request.user.id) & (Q(pickup_date__lte=datetime.datetime.now()) | Q(is_active=False)))
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def allocate_car(request, id):
     car = models.Car.objects.get(pk=id)
     # if already allocated return error
@@ -198,6 +209,7 @@ def allocate_car(request, id):
     return Response({"deallocate_time": str(allocate_second)})
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def deallocate_car(request, id):
     utils.deallocate_car(id)
     return Response("car {} is deallocated".format(id))
