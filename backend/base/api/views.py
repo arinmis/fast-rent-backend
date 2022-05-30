@@ -163,24 +163,33 @@ def reservation(request, id = None):
         print(request.user.id, serializer.data)
         return Response(serializer.data)
     elif request.method == "POST":
-        try:
-            print("reservation being is creating", request.data, "data")
-            print(type(models.Car.objects.get(id=request.data["car"])))
-            reservation = models.Reservation.objects.create(
-                    user = models.User.objects.get(id=request.data["user"]),
-                    car = models.Car.objects.get(id=request.data["car"]),
-                    pickup_location = models.Location.objects.get(id=request.data["pickup_location"]),
-                    return_location = models.Location.objects.get(id=request.data["return_location"]),
-                    pickup_date = utils.epoch_to_date(request.data["pickup_date"]),
-                    return_date = utils.epoch_to_date(request.data["return_date"]),
-                    is_active=True,
-                    )
-            print("saving")
-            reservation.save()
-            return Response("Reservation created")
+        # try:
+        print("reservation being is creating", request.data, "data")
+        print(type(models.Car.objects.get(id=request.data["car"])))
+
+        user = models.User.objects.get(id=request.data["user"]),
+        car = models.Car.objects.get(id=request.data["car"]),
+
+        # check whether the use has allocated car before reservations
+        if user[0].id != car[0].allocated_by.id:
+             return Response("car {} already has been allocated".format(id), status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        reservation = models.Reservation.objects.create(
+                user = user[0],  
+                car = car[0],  
+                pickup_location = models.Location.objects.get(id=request.data["pickup_location"]),
+                return_location = models.Location.objects.get(id=request.data["return_location"]),
+                pickup_date = utils.epoch_to_date(request.data["pickup_date"]),
+                return_date = utils.epoch_to_date(request.data["return_date"]),
+                is_active=True,
+                )
+        reservation.save()
+        return Response("Reservation created")
+        """
         except Exception as e:
-            print("here")
+            print("here", e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        """
         
     elif request.method == "DELETE":
         # deactivate reservation
@@ -214,7 +223,7 @@ def allocate_car(request, id):
     car.allocated_by = request.user
     car.save()
     # time for allocation
-    allocate_second = 10
+    allocate_second = 30
     t = Timer(allocate_second, utils.deallocate_car, [id])
     print("car {} will be deallocated in {} sn".format(id, allocate_second))
     t.start()
