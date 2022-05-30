@@ -7,6 +7,6 @@ def epochToDate(epoch):
 # deacllocate car with given id 
 def deallocate_car(id):
     car = models.Car.objects.get(pk=id)
-    car.is_allocated = False
+    car.allocated_by = None 
     car.save()
-    print("car.is_allocated", id, car.is_allocated)
+    print("car {} is deallocated" .format(car.id))
