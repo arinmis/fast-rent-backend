@@ -1,7 +1,7 @@
 import datetime
 import base.models as models
 
-def epochToDate(epoch):
+def epoch_to_date(epoch):
     return datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d')
 
 # deacllocate car with given id 

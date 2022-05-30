@@ -86,8 +86,8 @@ def car(request):
     elif request.method == "POST":
         # cars that are rented given range
         cars_busy = models.Reservation.objects.filter(
-                (Q(pickup_date__gte=utils.epochToDate(request.data["pickup_date"])) &
-                    Q(return_date__lte=utils.epochToDate(request.data["return_date"]))) &
+                (Q(pickup_date__gte=utils.epoch_to_date(request.data["pickup_date"])) &
+                    Q(return_date__lte=utils.epoch_to_date(request.data["return_date"]))) &
                 Q(is_active=True)
                 ).values_list("car")
         print("cars busy", cars_busy)
@@ -164,18 +164,24 @@ def reservation(request, id = None):
         return Response(serializer.data)
     elif request.method == "POST":
         try:
-            reservation = models.Reservation.create(
-                    user = models.User.objects.get(pk=request.data["user"]),
-                    car = models.Car.objects.get(pk=request.data["car"]),
+            print("reservation being is creating", request.data, "data")
+            print(type(models.Car.objects.get(id=request.data["car"])))
+            reservation = models.Reservation.objects.create(
+                    user = models.User.objects.get(id=request.data["user"]),
+                    car = models.Car.objects.get(id=request.data["car"]),
                     pickup_location = models.Location.objects.get(id=request.data["pickup_location"]),
-                    return_location = models.Location.objects.filter(id=request.data["return_location"]),
-                    pickup_date = utils.epochToDate(request.data["pickup_date"]),
-                    return_date = utils.epochToDate(request.data["return_date"]),
+                    return_location = models.Location.objects.get(id=request.data["return_location"]),
+                    pickup_date = utils.epoch_to_date(request.data["pickup_date"]),
+                    return_date = utils.epoch_to_date(request.data["return_date"]),
+                    is_active=True,
                     )
+            print("saving")
             reservation.save()
             return Response("Reservation created")
-        except:
+        except Exception as e:
+            print("here")
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
     elif request.method == "DELETE":
         # deactivate reservation
         if id:
