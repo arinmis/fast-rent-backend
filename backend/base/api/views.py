@@ -248,3 +248,36 @@ def allocate_car(request, id):
 def deallocate_car(request, id):
     utils.deallocate_car(id)
     return Response("car {} is deallocated".format(id))
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def statistics(request):
+    response = {}
+    response["reserved_cars"] =  len(models.Car.objects.filter(is_reserved=True))
+    response["not_reserved_cars"] =  len(models.Car.objects.filter(is_reserved=False))
+    response["reservations_active"] = len(models.Reservation.objects.filter(is_active=True))
+    response["reservations_passive"] = len(models.Reservation.objects.filter(is_active=False))
+    return Response(response)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_reservations(request):
+    print("here")
+    if request.method == "GET":
+        reservations = models.Reservation.objects.filter(is_active=True)
+        serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_rents(request):
+    print("here")
+    if request.method == "GET":
+        reservations = models.Reservation.objects.filter()
+        serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
+        return Response(serializer.data)
+
