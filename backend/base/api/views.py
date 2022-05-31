@@ -167,16 +167,21 @@ def reservation(request, id = None):
         print("reservation being is creating", request.data, "data")
         print(type(models.Car.objects.get(id=request.data["car"])))
 
-        user = models.User.objects.get(id=request.data["user"]),
-        car = models.Car.objects.get(id=request.data["car"]),
+        user = models.User.objects.get(id=request.data["user"])
+        car = models.Car.objects.get(id=request.data["car"])
 
         # check whether the use has allocated car before reservations
-        if user[0].id != car[0].allocated_by.id:
-             return Response("car {} already has been allocated".format(id), status=status.HTTP_406_NOT_ACCEPTABLE)
+        if car.is_reserved or (car.allocated_by != None and user.id != car.allocated_by.id):
+            print(car.is_reserved)
+            print(car.allocated_by)
+            print(user.id, car.allocated_by.id)
+            return Response(
+                     "car {} doesn't available right now, select another one".format(id),
+                     status=status.HTTP_406_NOT_ACCEPTABLE)
 
         reservation = models.Reservation.objects.create(
-                user = user[0],  
-                car = car[0],  
+                user = user,  
+                car = car,  
                 pickup_location = models.Location.objects.get(id=request.data["pickup_location"]),
                 return_location = models.Location.objects.get(id=request.data["return_location"]),
                 pickup_date = utils.epoch_to_date(request.data["pickup_date"]),
@@ -184,6 +189,10 @@ def reservation(request, id = None):
                 is_active=True,
                 )
         reservation.save()
+
+        # mark car as reserved 
+        car.is_reserved = True
+        car.save()
         return Response("Reservation created")
         """
         except Exception as e:
@@ -195,8 +204,13 @@ def reservation(request, id = None):
         # deactivate reservation
         if id:
             reservation = models.Reservation.objects.filter(id=id)[0]
+            reservation.car.is_reserved = False 
+            reservation.car.allocated_by = None 
             reservation.is_active = False
+            # save changes
             reservation.save()
+            reservation.car.save()
+            print("car reservatsion:", reservation.car.is_reserved)
             return Response("reservation " + id + " is deactivated")
         return Response(id, status=status.HTTP_400_BAD_REQUEST)
 
@@ -223,7 +237,7 @@ def allocate_car(request, id):
     car.allocated_by = request.user
     car.save()
     # time for allocation
-    allocate_second = 30
+    allocate_second = 10
     t = Timer(allocate_second, utils.deallocate_car, [id])
     print("car {} will be deallocated in {} sn".format(id, allocate_second))
     t.start()
