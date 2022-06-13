@@ -277,7 +277,16 @@ def all_reservations(request):
 def all_rents(request):
     print("here")
     if request.method == "GET":
-        reservations = models.Reservation.objects.filter()
+        reservations = models.Reservation.objects.all()
         serializer = serializers.ReservationSerializer(reservations, many=True, context={"request": request})
         return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def customers(request):
+    print("here")
+    user  = models.User.objects.filter(is_staff=False)
+    serializer = serializers.UserSerializer(user, many=True, context={"request": request})
+    return Response(serializer.data)
+
 
