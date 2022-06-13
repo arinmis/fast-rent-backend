@@ -15,6 +15,7 @@ urlpatterns = [
     path('car/', views.car), 
     path('all-reservations/', views.all_reservations), 
     path('all-rents/', views.all_rents), 
+    path('customers/', views.customers), 
     path('statistics/', views.statistics), 
     re_path(r'^car-crud/((?P<id>\d+)/)?$', views.car_crud), 
     path('rent/', views.rent), 
